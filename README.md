@@ -22,9 +22,9 @@ This will spin up the services, it will also create the topic `vehicle-positions
 
 Source of this producer image is located here https://github.com/ramdhakne/cp-kafka
 
-- Jump to [Java](kafka/java/README.md)
-- Jump to [Golang](kafka/go/README.md)
-- Jump to [NodeJS](kafka/nodejs/README.md)
+- Jump to [Java](kafka/java/)
+- Jump to [Golang](kafka/go/)
+- Jump to [NodeJS](kafka/nodejs/)
 
 
 The sample applications basically reads off a topic `vehicle-positions` and eventually sends the records to RedisDB.  Some rudimentary API is provided as well to inspect entries stored in Redis.
