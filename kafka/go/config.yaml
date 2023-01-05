@@ -1,0 +1,5 @@
+bootstrap_servers: "kafka:9092"
+consumer_group: "sample-go-consumer"
+redis: "localhost:6379"
+redisDB: 1
+redisDBGeo: 2
