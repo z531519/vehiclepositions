@@ -1,0 +1,18 @@
+spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      # value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # value-deserializer: org.apache.kafka.common.serialization.JsonDeserializer
+    streams:
+      application-id: vehicle-positions-stream      
+      properties:
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        default.value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+  data:
+    redis:
+      host: localhost
+      port: 6379

@@ -1,0 +1,21 @@
+# Default values for vpconsumer-service.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+tetrate:
+  enabled: true
+  organization: gap
+  tenant: gap
+  workspace: com-martech-workspace
+  trafficGroup: com-martech-traffic
+  
+enabled: true
+gateway: gwy-{{ .Release.Namespace }}
+virtualService:
+  host: com-martech.aks.dev.azeus.gaptech.com
+  prefix: /vpconsumer-service
+  rewrite: /
+  route:
+    destination:
+      port:
+        number: 443
