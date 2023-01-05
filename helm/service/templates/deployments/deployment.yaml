@@ -1,0 +1,99 @@
+
+
+{{- $fullName := include "my-service.fullname" . -}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "my-service.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+ 
+  {{ with .Values.strategy }}
+  strategy:
+  {{- toYaml . | nindent 4 }}
+  {{ end }}
+  selector:
+    matchLabels:
+      {{- include "my-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      name: {{ include "my-service.name" . }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "my-service.selectorLabels" . | nindent 8 }}
+        
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{ if .Values.serviceAccount.create }}
+      serviceAccountName: "sa-{{ include "my-service.serviceAccountName" . }}"
+      {{ end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        env:   
+          {{- toYaml .Values.containers.env | nindent 10 }}
+        envFrom:
+          {{- toYaml .Values.containers.envFrom | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        {{ if .Values.repositories.app }}
+        image: "{{ .Values.repositories.app }}/{{ .Values.image.namespace }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        {{ else }}
+        image: "{{ .Values.image.namespace }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        {{ end }}
+        
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- with .Values.containers.ports }}
+        ports:
+          {{- toYaml . | nindent 10 }}
+        {{ end }}
+        {{ if .Values.containers.healthEndpoints.enabled }}
+        {{- with .Values.containers.healthEndpoints.livenessProbe }}
+        livenessProbe:
+          {{- toYaml . | nindent 10 }}
+        {{ end }}
+        {{- with .Values.containers.healthEndpoints.readinessProbe }}
+        readinessProbe:
+          {{- toYaml . | nindent 10 }}
+          {{ end }}
+        {{ end }}        
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+
+        {{if .Values.volumeMounts}}   
+        volumeMounts:
+          {{- with .Values.volumeMounts }}        
+            {{- toYaml . | nindent 10 }}
+          {{- end }}        
+        {{ end }}
+        
+        
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      

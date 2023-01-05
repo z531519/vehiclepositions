@@ -1,0 +1,33 @@
+{{- $fullName := include "my-service.fullname" . -}}
+{{- $labels := include "my-service.labels" . }}
+{{- $release := .Release.Namespace }}
+{{ if .Values.autoscaling.hpa.enabled }}
+{{ $hpa := .Values.autoscaling.hpa }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- $labels | nindent 4 }}
+    namespace: {{ $release }}
+spec:
+  scaleTargetRef:    
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $fullName }}
+  minReplicas: {{ $hpa.minReplicas }}
+  maxReplicas: {{ $hpa.maxReplicas }}
+  metrics:
+    {{- if $hpa.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ $hpa.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if $hpa.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ $hpa.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{ end }}
