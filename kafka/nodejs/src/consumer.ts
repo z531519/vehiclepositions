@@ -5,7 +5,7 @@ const consumer = kafka.consumer({ groupId: "sample-js-slim-group" });
 
 const startConsumer = async () => {
   await consumer.connect();
-  await consumer.subscribe({ topic: "vehicle-positions-slim" });
+  await consumer.subscribe({ topic: "vehicle-positions-slimjs" });
 
   const client = await initRedisClient();
 
