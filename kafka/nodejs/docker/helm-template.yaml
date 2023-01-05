@@ -1,0 +1,149 @@
+---
+# Source: my-service/templates/serviceaccount/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "sa-vpconsumer-js-service"
+  labels:
+    helm.sh/chart: my-service-0.1.0
+    app.kubernetes.io/name: vpconsumer-js
+    app.kubernetes.io/instance: sample-js
+    app: vpconsumer-js
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: my-service/templates/configmap/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vpconsumer-js
+data:
+  abc: def
+---
+# Source: my-service/templates/services/service-istio.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "svc-vpconsumer-js"
+  labels:
+    helm.sh/chart: my-service-0.1.0
+    app.kubernetes.io/name: vpconsumer-js
+    app.kubernetes.io/instance: sample-js
+    app: vpconsumer-js
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+spec:
+  type: ClusterIP
+  
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: http
+  
+  selector:
+    app.kubernetes.io/name: vpconsumer-js
+    app.kubernetes.io/instance: sample-js
+    app: vpconsumer-js
+---
+# Source: my-service/templates/deployments/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpconsumer-js
+  namespace: default
+  labels:
+    helm.sh/chart: my-service-0.1.0
+    app.kubernetes.io/name: vpconsumer-js
+    app.kubernetes.io/instance: sample-js
+    app: vpconsumer-js
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+ 
+  
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vpconsumer-js
+      app.kubernetes.io/instance: sample-js
+      app: vpconsumer-js
+  template:
+    metadata:
+      name: vpconsumer-js
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      labels:
+        app.kubernetes.io/name: vpconsumer-js
+        app.kubernetes.io/instance: sample-js
+        app: vpconsumer-js
+        
+    spec:
+      
+      serviceAccountName: "sa-vpconsumer-js-service"
+      
+      securityContext:
+        {}
+      containers:
+      - name: my-service
+        env:
+          - name: BOOTSTRAP_SERVERS
+            value: confluent-cp-kafka.confluent:9092
+          - name: REDIS
+            value: redis-master.default:6379
+        envFrom:
+          null
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 33
+        
+        image: "vpconsumer-js:latest"
+        
+        
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+        
+        
+                
+        resources:
+          null
+---
+# Source: my-service/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "vpconsumer-js-test-connection"
+  labels:
+    helm.sh/chart: my-service-0.1.0
+    app.kubernetes.io/name: vpconsumer-js
+    app.kubernetes.io/instance: sample-js
+    app: vpconsumer-js
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['vpconsumer-js:']
+  restartPolicy: Never
