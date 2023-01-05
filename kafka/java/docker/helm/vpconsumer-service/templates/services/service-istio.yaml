@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "svc-{{ include "vpconsumer-service.fullname" . }}"
+  labels:
+    {{- include "vpconsumer-service.labels" . | nindent 4 }}
+  annotations:
+spec:
+  type: {{ .Values.service.type }}
+  {{ with .Values.service.ports }}
+  ports:
+  {{- toYaml . | nindent 2 }}
+  {{ end }}
+  selector:
+  {{- include "vpconsumer-service.selectorLabels" . | nindent 4 }}

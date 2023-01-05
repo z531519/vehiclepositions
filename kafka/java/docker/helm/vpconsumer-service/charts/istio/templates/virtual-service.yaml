@@ -1,0 +1,62 @@
+{{ if .Values.enabled }}
+{{- $fullName := include "vpconsumer-service-istio.fullname" . -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: ivs-{{ $fullName }}
+  namespace: {{ .Release.Namespace }}
+  {{ if .Values.tetrate.enabled }}
+  annotations:
+    tsb.tetrate.io/organization: {{ .Values.tetrate.organization }}
+    tsb.tetrate.io/tenant: {{ .Values.tetrate.tenant }}
+    tsb.tetrate.io/workspace: {{ .Values.tetrate.workspace }}
+    tsb.tetrate.io/trafficGroup: {{ .Values.tetrate.trafficGroup }}
+  {{ end }}  
+spec:
+  gateways:
+  - {{ tpl .Values.gateway . }}
+  hosts:
+  - {{ .Values.virtualService.host }}
+  http:
+  - name: canary-testing
+    match:
+    - headers:
+        canary-test:
+          exact: "yes"
+      uri:
+        prefix: {{ .Values.virtualService.prefix }}/
+    - headers:
+        canary-test:
+          exact: "yes"
+      uri:
+        exact: {{ .Values.virtualService.prefix }}
+    rewrite:
+      uri: {{ .Values.virtualService.rewrite }}
+    route:
+    - destination:
+        host: svc-{{ $fullName }}
+        port:
+          number: {{ .Values.virtualService.route.destination.port.number }} 
+        subset: canary
+  - name: canary-rollout   # Referenced in canary.trafficRouting.istio.virtualService.routes in the Rollout yaml
+    match:
+    - uri:
+        prefix: {{ .Values.virtualService.prefix }}/
+    - uri:
+        exact: {{ .Values.virtualService.prefix }}
+    rewrite:
+      uri: {{ .Values.virtualService.rewrite }}
+    route:
+    - destination:
+        host: svc-{{ $fullName }}
+        port:
+          number: {{ .Values.virtualService.route.destination.port.number }}
+        subset: stable
+      weight: 100
+    - destination:
+        host: svc-{{ $fullName }}
+        port:
+          number: {{ .Values.virtualService.route.destination.port.number }}
+        subset: canary
+      weight: 0 
+{{ end }}

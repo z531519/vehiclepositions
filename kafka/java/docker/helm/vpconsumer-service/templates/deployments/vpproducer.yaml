@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpproducer-deployment
+  namespace: vpconsumer
+  labels:
+    app: vpproducer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vpproducer
+  template:
+    metadata:
+      labels:
+        app: vpproducer
+    spec:
+      containers:
+        - name: vpproducer
+          image: proton69/java-producer:paramsV2
+          env:
+            - name: KAFKA_BROKERS
+              value: "confluent-cp-kafka.confluent:9092"

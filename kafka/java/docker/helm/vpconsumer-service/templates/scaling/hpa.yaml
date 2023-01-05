@@ -1,0 +1,39 @@
+{{- $fullName := include "vpconsumer-service.fullname" . -}}
+{{- $labels := include "vpconsumer-service.labels" . }}
+{{- $release := .Release.Namespace }}
+{{- $argoEnabled := .Values.argo.enabled  -}}
+{{ if and ( .Values.autoscaling.hpa.enabled) ( not .Values.autoscaling.keda.enabled ) }}
+{{ $hpa := .Values.autoscaling.hpa }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- $labels | nindent 4 }}
+    namespace: {{ $release }}
+spec:
+  scaleTargetRef:
+    {{ if $argoEnabled }}
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
+    {{ else }}
+    apiVersion: apps/v1
+    kind: Deployment
+    {{ end }}
+    name: {{ $fullName }}
+  minReplicas: {{ $hpa.minReplicas }}
+  maxReplicas: {{ $hpa.maxReplicas }}
+  metrics:
+    {{- if $hpa.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ $hpa.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if $hpa.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ $hpa.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{ end }}
