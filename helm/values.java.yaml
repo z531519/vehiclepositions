@@ -36,11 +36,9 @@ containers:
     enabled: true
   env:
     - name: SPRING_KAFKA_BOOTSTRAPSERVERS
-      value: "confluent-cp-kafka.confluent:9092"
-      # value: "host.docker.internal:39092"
+      value: ${BOOTSTRAP_SERVERS}
     - name: SPRING_DATA_REDIS_HOST
-      value: redis-master.default
-      # value: "host.docker.internal"
+      value: ${REDIS}
   envFrom:
    
 

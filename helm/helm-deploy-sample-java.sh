@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
 # installs the vpconsumer-service helm chart
+. ./common.sh
 
-helm upgrade vpconsumer-java service -f values.java.yaml --install --namespace vpconsumer --create-namespace
+envsubst < values.java.yaml | helm upgrade vpconsumer-java service -f - --install --namespace vpconsumer --create-namespace

@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
 # installs the vpconsumer-service helm chart
+. ./common.sh
 
-helm upgrade vpconsumer-go service -f values.go.yaml --install --namespace vpconsumer --create-namespace
+envsubst < values.go.yaml | helm upgrade vpconsumer-go service -f - --install --namespace vpconsumer --create-namespace

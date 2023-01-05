@@ -13,5 +13,5 @@ replicaCount: 1 # if autoscaling.pattern: none, this will be selected
 containers:
   env:
     - name: KAFKA_BROKERS
-      value: "confluent-cp-kafka.confluent:9092"
-      # value: "host.docker.internal:39092"
+      value: ${BOOTSTRAP_SERVERS}
+

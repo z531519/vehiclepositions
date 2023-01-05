@@ -2,4 +2,6 @@
 
 # installs the vpconsumer-service helm chart
 
-helm upgrade vpproducer service -f values.producer.yaml --install --namespace vpconsumer --create-namespace
+. ./common.sh
+
+envsubst < values.producer.yaml | helm upgrade vpproducer service -f - --install --namespace vpconsumer --create-namespace

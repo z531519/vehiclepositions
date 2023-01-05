@@ -40,11 +40,9 @@ containers:
     enabled: true
   env:
     - name: BOOTSTRAP_SERVERS
-      value: "confluent-cp-kafka.confluent:9092"
-      # value: "host.docker.internal:39092"
+      value: ${BOOTSTRAP_SERVERS}
     - name: REDIS
-      value: redis://redis-master.default:6379
-      # value: "host.docker.internal"
+      value: redis://${REDIS}:6379
   envFrom:
 
 

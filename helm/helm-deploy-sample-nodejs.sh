@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
 # installs the vpconsumer-service helm chart
+. ./common.sh
 
-helm upgrade vpconsumer-nodejs service -f values.nodejs.yaml --install --namespace vpconsumer --create-namespace
+envsubst < values.nodejs.yaml | helm upgrade vpconsumer-nodejs service -f - --install --namespace vpconsumer --create-namespace
