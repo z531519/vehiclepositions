@@ -1,0 +1,17 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+name: vpproducer
+
+image:
+  namespace: proton69/java-producer
+  tag: paramsV2
+  
+replicaCount: 1 # if autoscaling.pattern: none, this will be selected
+
+
+
+containers:
+  env:
+    - name: KAFKA_BROKERS
+      value: "confluent-cp-kafka.confluent:9092"
+      # value: "host.docker.internal:39092"

@@ -1,46 +1,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-repositories:
-  base: 
-  app: 
+name: vpconsumer-java
 
 image:
-  pullPolicy: IfNotPresent
-
   namespace: vpconsumer
   tag: latest
   
-
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-
-argo:
-  enabled: false
- 
-istio:
-  enabled: false
-  tetrate:
-    enabled: true
-
-aadPodIdentity:
-  enabled: true
-  identity: ""    # defaults to "aib-vpconsumer-service"
-
-service:
-  type: ClusterIP        # Assigned LoadBalancer if ingress.pattern=loadbalancer
-  ports:
-    - name: http
-      protocol: TCP
-      port: 80
-      targetPort: http
-    - name: https
-      protocol: TCP
-      port: 443
-      targetPort: http 
-
- 
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -48,21 +14,7 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: "vpconsumer-service"
-
-podAnnotations: 
-  sidecar.istio.io/rewriteAppHTTPProbers: "true"
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext:
-   capabilities:
-     drop:
-     - ALL
-   readOnlyRootFilesystem: false
-   runAsNonRoot: true
-   runAsUser: 33
+  name: "vpconsumer-java-service"
 
 resources: 
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -77,25 +29,6 @@ resources:
   #   memory: 1Gi
     
 replicaCount: 1 # if autoscaling.pattern: none, this will be selected
-
-autoscaling:
-  hpa:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 4
-    targetCPUUtilizationPercentage: 65
-    #targetMemoryUtilizationPercentage: 65
-  keda:
-    enabled: false
-    pollingInterval: 15
-    cooldownPeriod:  10
-    minReplicaCount: 1
-    maxReplicaCount: 4    
-    triggers:
-    - type: cpu
-      metadata:
-        type: Utilization
-        value: "65"            
 
 
 containers:
