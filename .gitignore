@@ -47,8 +47,3 @@ coverage
 
 # Temp files
 temp/
-from/
-bad/
-data/
-status/
-scripts/secrets
