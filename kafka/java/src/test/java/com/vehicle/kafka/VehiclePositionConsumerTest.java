@@ -41,7 +41,7 @@ public class VehiclePositionConsumerTest {
 
 
   @Test
-  public void givenEmbeddedKafkaBroker_whenSendingWithSimpleProducer_thenMessageReceived()
+  public void singleMessageShouldGoThruStreamThenConsumerToRedis()
       throws Exception {
 
     String jsonValue = objectMapper.writeValueAsString(sampleJson);
