@@ -3,7 +3,10 @@ package com.vehicle.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @RedisHash()
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VehiclePosition {
 
   @Id

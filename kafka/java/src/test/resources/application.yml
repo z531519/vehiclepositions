@@ -1,0 +1,17 @@
+spring:
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      group-id: baeldung
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+    streams:
+      application-id: vehicle-positions-stream      
+      properties:
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        default.value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+  data:
+    redis:
+      host: localhost
+      port: 6379
+test:
+  topic: vehicle-positions
