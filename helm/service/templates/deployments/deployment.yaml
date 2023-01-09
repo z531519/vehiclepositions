@@ -42,7 +42,7 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-      - name: {{ .Chart.Name }}
+      - name: {{ include "my-service.name" . }}
         env:   
           {{- toYaml .Values.containers.env | nindent 10 }}
         envFrom:
