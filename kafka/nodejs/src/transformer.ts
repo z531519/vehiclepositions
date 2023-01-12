@@ -11,7 +11,7 @@ const producer = kafka.producer({
 async function sendPayload(vehiclePosition: any) {
   try {
     await producer.send({
-      topic: "vehicle-positions-slim",
+      topic: "vehicle-positions-slimjs",
       messages: [
         {
           key: String(vehiclePosition.veh),
@@ -32,11 +32,11 @@ const startTransformer = async () => {
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
-      console.log("Received: ", {
-        partition,
-        offset: message.offset,
-        value: message?.value?.toString()
-      });
+      // console.log("Received: ", {
+      //   partition,
+      //   offset: message.offset,
+      //   value: message?.value?.toString()
+      // });
       if (message.value) {
         const vp: any = JSON.parse(message.value.toString());
         await sendPayload(vp.VP);

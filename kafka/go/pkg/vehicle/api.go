@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/gin-gonic/gin"
+	cors "github.com/rs/cors/wrapper/gin"
 )
 
 var config Config
@@ -12,6 +13,8 @@ var config Config
 func StartApi(config Config) {
 	config = config
 	r := gin.Default()
+	r.Use(cors.Default())
+
 	r.GET("/ping", Ping)
 	r.GET("vehicle/positions", GetAll)
 	r.GET("vehicle/positions/:id", Get)

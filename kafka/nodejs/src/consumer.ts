@@ -11,11 +11,11 @@ const startConsumer = async () => {
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
-      console.log("Received: ", {
-        partition,
-        offset: message.offset,
-        value: message?.value?.toString()
-      });
+      // console.log("Received: ", {
+      //   partition,
+      //   offset: message.offset,
+      //   value: message?.value?.toString()
+      // });
       if (message.value) {
         const vpraw = message.value.toString();
         const vp = JSON.parse(vpraw);

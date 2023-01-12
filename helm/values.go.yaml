@@ -2,6 +2,9 @@
 # Declare variables to be passed into your templates.
 name: vpconsumer-go
 
+repositories:
+  app: localhost:5001  
+
 image:
   namespace: vpconsumer-go
   tag: latest

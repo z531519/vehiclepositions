@@ -9,6 +9,10 @@ The sample application does the following
 
 ### Running the app
 
+```
+export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@3/lib/pkgconfig"
+```
+
 (Make sure you got the kafka and redis services running)
 
 Follow instruction on installing the librdkafka library as referenced in the link above.  To run the application
