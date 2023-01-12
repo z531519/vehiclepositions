@@ -64,7 +64,36 @@ const startApi = async () => {
 
     res.send(response);
 
-    // res.contentType('application/vnd.google-earth.kml+xml').send(response);
+  });
+
+  app.get("/vehicle/positions/:id/geojson2", async (req, res) => {
+    const list = await client.lRange(req.params.id, 0, -1)
+    const lines = list.map((raw) => {
+      const vp = JSON.parse(raw);
+      return [   vp.long, vp.lat, ];
+    })
+
+    const points = list.map((raw) => {
+      const vp = JSON.parse(raw);
+      return { latitude: vp.lat, longitude: vp.long };
+    })
+    
+    // const geojsonObject = geojson.parse([{
+    //   lines
+    // }], {
+    //   LineString: 'lines',
+    // });
+
+    const geojsonObject = geojson.parse(points, {
+      Point: ['latitude', 'longitude'],
+    });
+
+    // geojsonObject.features = [...geojsonObject.features, ...geojsonPoints.features];
+
+    const response = geojsonObject;
+
+    res.send(response);
+
   });
 
   app.listen(port, () => {

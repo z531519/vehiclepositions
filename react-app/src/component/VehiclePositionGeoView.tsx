@@ -42,24 +42,12 @@ export default function VehiclePositionGeoView() {
     return item.tsi;
   }
 
-  const columns = [
-    { field: 'tsi', headerName: 'ID', width: 170 },
-    { field: 'tst', headerName: 'TST', width: 200 },
-    { field: 'lat', headerName: 'LAT', width: 170 },
-    { field: 'long', headerName: 'LONG', width: 170 },
-    { field: 'spd', headerName: 'SPD', width: 170 },
-    { field: 'route', headerName: 'ROUTE', width: 170 },
-    { field: 'oday', headerName: 'ODAY', width: 170 },
-    { field: 'start', headerName: 'START', width: 170 }
-  ];
-
-  const geoJsonLink = "http://localhost:8080/vehicle/positions/1147/geojson"
-
   const getCenter = (): [number, number] => {
     const totalFeatures = serviceData?.features.length;
 
     const coordinates = serviceData?.features[Math.round(totalFeatures / 2) - 1].geometry.coordinates
     return [coordinates[1], coordinates[0]];
+
   }
 
   return (
@@ -71,7 +59,7 @@ export default function VehiclePositionGeoView() {
           data={serviceData}
           styleCallback={(feature: { geometry: { type: string; }; }, hover: any) => {
             if (feature.geometry.type === "LineString") {
-              return { strokeWidth: "1", stroke: "black" };
+              return { strokeWidth: "1", stroke: "red" };
             }
             return {
               fill: "#d4e6ec99",
