@@ -47,3 +47,5 @@ coverage
 
 # Temp files
 temp/
+
+.DS_Store
