@@ -14,6 +14,8 @@ import VehiclePositionGeoMap from './VehiclePositionGeoMap';
 interface filter {
   jrn: string;
   dir: string;
+  oper: string;
+  route:string;
 }
 
 export default function VehiclePositionGeoView() {
@@ -32,7 +34,15 @@ export default function VehiclePositionGeoView() {
   const [oday, setOday] = useState<string>();
   const [jrns, setJrns] = useState<string[]>([]);
   const [dirs, setDirs] = useState<string[]>([]);
-  const [filter, setFilter] = useState<filter>({jrn:"None", dir: "None"});
+  const [opers, setOpers] = useState<string[]>([]);
+  const [routes, setRoutes] = useState<string[]>([]);
+
+  const [filter, setFilter] = useState<filter>({
+    jrn:"None", 
+    dir: "None",
+    oper: "None",
+    route: "None",
+  });
 
   let { id = "" } = useParams();
 
@@ -42,10 +52,11 @@ export default function VehiclePositionGeoView() {
         setServiceData(data);
         filterData(data);
         enqueueSnackbar(`Loaded Geo for ${oday}`);
-        
-        const jrns = data.features.map((item:any) => item.properties.jrn).filter((v: any,i: any,a: string | any[])=>a.indexOf(v)==i)
-        setJrns(jrns);
+                
+        setJrns(data.features.map((item:any) => item.properties.jrn).filter((v: any,i: any,a: string | any[])=>a.indexOf(v)==i));
         setDirs( data.features.map((item:any) => item.properties.dir).filter((v: any,i: any,a: string | any[])=>a.indexOf(v)==i));
+        setOpers( data.features.map((item:any) => item.properties.oper).filter((v: any,i: any,a: string | any[])=>a.indexOf(v)==i));
+        setRoutes( data.features.map((item:any) => item.properties.route).filter((v: any,i: any,a: string | any[])=>a.indexOf(v)==i));
         
       });
     }
@@ -77,9 +88,19 @@ export default function VehiclePositionGeoView() {
     filterData(serviceData);
   }
 
+  const onOperChange = (event: SelectChangeEvent<string>, child: React.ReactNode): any => {
+    filter.oper = event.target.value;
+    filterData(serviceData);
+  }
+
+  const onRouteChange = (event: SelectChangeEvent<string>, child: React.ReactNode): any => {
+    filter.route = event.target.value;
+    filterData(serviceData);
+  }
+
   const filterData = (data:any):void => {
     setGeoJsonData(geoJsonSample);
-    const {jrn, dir} = filter;
+    const {jrn, dir, route, oper} = filter;
 
     const allFeatures = [...data.features];
     const filtered = allFeatures.filter((item:any) => {
@@ -89,6 +110,12 @@ export default function VehiclePositionGeoView() {
       }
       if (dir && dir != "None"){ 
         inc = inc && item.properties.dir == dir
+      }
+      if (route && route != "None"){ 
+        inc = inc && item.properties.route == route
+      }
+      if (oper && oper != "None"){ 
+        inc = inc && item.properties.oper == oper
       }
       return inc;
     })
@@ -126,6 +153,34 @@ export default function VehiclePositionGeoView() {
                 >
                 <MenuItem value="None">None</MenuItem>                
                 {dirs.map((row: any) => (
+                  <MenuItem key={row} value={row}>{row}</MenuItem>
+                ))
+                }
+              </Select>
+            </FormControl>
+
+            <FormControl size='small'>
+              <InputLabel id="demo-simple-select-label">oper</InputLabel>
+              <Select defaultValue="None"
+                label="opers"
+                onChange={onOperChange}
+                >
+                <MenuItem value="None">None</MenuItem>                
+                {opers.map((row: any) => (
+                  <MenuItem key={row} value={row}>{row}</MenuItem>
+                ))
+                }
+              </Select>
+            </FormControl>
+
+            <FormControl size='small'>
+              <InputLabel id="demo-simple-select-label">routes</InputLabel>
+              <Select defaultValue="None"
+                label="routes"
+                onChange={onRouteChange}
+                >
+                <MenuItem value="None">None</MenuItem>                
+                {routes.map((row: any) => (
                   <MenuItem key={row} value={row}>{row}</MenuItem>
                 ))
                 }
