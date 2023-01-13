@@ -2,6 +2,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Dependencies
+
+Frontend to Services provided by the [NodeJS API](../kafka/nodejs).  You will need to startup the service and all its dependencies (kafka/redis/...) to get some data here.
+
 ## Available Scripts
 
 In the project directory, you can run:

@@ -3,9 +3,9 @@ import { DataGrid, GridColumns, GridEventListener } from '@mui/x-data-grid';
 
 import { useState, useEffect } from 'react';
 
-import { fetchVehiclePositions } from '../services/VehiclePositionService';
+
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import { useVehiclePositionService } from '../services/ServiceHook';
 
 
@@ -17,11 +17,15 @@ export default function VehiclePositionsComponent() {
   const [serviceData, setServiceData] = useState<any[]>([]);
   const navigate = useNavigate();
   const columns: GridColumns = [
-    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'id', headerName: 'ID', width: 170, align:"center", headerAlign:"center" },
     {
-      field: 'view', headerName: 'Actions', width: 400, renderCell: (cellValues) => {
+      field: 'view', headerName: 'Actions', width: 400, align:"center", headerAlign:"center", 
+      renderCell: (cellValues) => {
         return (
-          <div>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              
+            
           <Button
             variant="contained"
             color="primary"
@@ -31,6 +35,8 @@ export default function VehiclePositionsComponent() {
           >
             View Locations
           </Button>
+          </Grid>
+          <Grid item xs={6}>
           <Button
             variant="contained"
             color="primary"
@@ -40,7 +46,8 @@ export default function VehiclePositionsComponent() {
           >
             Geo View
           </Button>
-          </div>
+          </Grid>
+          </Grid>
         );
       }
     },

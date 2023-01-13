@@ -5,7 +5,7 @@ const consumer = kafka.consumer({ groupId: "sample-js-slim-group" });
 
 const startConsumer = async () => {
   await consumer.connect();
-  await consumer.subscribe({ topic: "vehicle-positions-slimjs" });
+  await consumer.subscribe({topic: "vehicle-positions-slimjs", fromBeginning: true });
 
   const client = await initRedisClient();
 
@@ -19,8 +19,11 @@ const startConsumer = async () => {
       if (message.value) {
         const vpraw = message.value.toString();
         const vp = JSON.parse(vpraw);
-        const key = message.key?.toString();
-        if (key) client.rPush(key, vpraw);
+        const veh = message.key;
+        const oday = vp.oday;
+                
+        client.sAdd(`veh:oday:${veh}`, oday);
+        client.rPush(`veh:geo:${veh}:${oday}`, vpraw);        
       }
     }
   });

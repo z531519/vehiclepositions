@@ -1,29 +1,32 @@
+import { Button, SelectChangeEvent } from '@mui/material';
 import { DataGrid, GridRowId, GridRowIdGetter } from '@mui/x-data-grid';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import VehiclePosition from '../model/VehiclePosition';
 import { useVehiclePositionService } from '../services/ServiceHook';
-import { fetchVehiclePositionLocations } from '../services/VehiclePositionService';
 import VehiclePositionLocationHeader from './VehiclePositionLocationHeader';
-
+import { useSnackbar } from 'notistack';
 
 export default function VehiclePositionLocations() {
   const vehiclePositionService = useVehiclePositionService( {
     base: 'http://localhost:8080'
   });
   
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [serviceData, setServiceData] = useState<VehiclePosition[]>([]);
+  const [oday, setOday] = useState<string>();
 
-  let { id } = useParams();
+  let { id = ""} = useParams();
 
   useEffect(() => {
-    if (id) {
-      vehiclePositionService?.fetchVehiclePositionLocations(id).then((data) => {
+    if (id && oday) {
+      vehiclePositionService?.fetchVehiclePositionLocations(id, oday).then((data) => {
         setServiceData(data);
+        enqueueSnackbar(`Loaded locations for ${oday}`);
       });
     }
-  }, [id, vehiclePositionService])
+  }, [id, oday, vehiclePositionService])
 
   const getRowId: GridRowIdGetter<VehiclePosition> = (item: VehiclePosition): GridRowId => {
     return item.tsi;
@@ -40,15 +43,18 @@ export default function VehiclePositionLocations() {
     { field: 'start', headerName: 'START', width: 170 }
   ];
 
+  const onOdayChange = (event: SelectChangeEvent<string>, oday:string):any => {
+    setOday(oday);
+  }
+
   return (
     <div>
-      <VehiclePositionLocationHeader vehiclePosition={serviceData[0]} />
+      <VehiclePositionLocationHeader veh={id} onChangeOday={onOdayChange} />
       <div style={{ height: 400, width: '100%' }}>
-
+        <Link to={ `/vehicles/${id}/geo`}>View Geo</Link>
         <DataGrid
           rows={serviceData}
           columns={columns}
-          // pageSize={25}
           getRowId={getRowId}          
         />
       </div>

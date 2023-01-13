@@ -1,28 +1,14 @@
 import VehiclePosition from "../model/VehiclePosition";
 
-export const fetchVehiclePositions = async function (): Promise<number[]> {
-  const response = await fetch('http://localhost:8080/vehicle/positions');
-  return response.json();
-}
-
-export const fetchVehiclePositionLocations = async function (id: string): Promise<VehiclePosition[]> {
-  const response = await fetch(`http://localhost:8080/vehicle/positions/${id}`);
-  return response.json();
-}
-
-export const fetchVehiclePositionGeoJson = async function (id: string): Promise<any> {
-  const response = await fetch(`http://localhost:8080/vehicle/positions/${id}/geojson`);
-  return response.json();
-}
-
-
 export interface IVehiclePositionService {
 
   fetchVehiclePositions(): Promise<number[]>;
 
-  fetchVehiclePositionLocations(id: string): Promise<VehiclePosition[]>;
+  fetchVehiclePositionOdays(veh: string): Promise<string[]>;
 
-  fetchVehiclePositionGeoJson(id: string): Promise<any>
+  fetchVehiclePositionLocations(veh: string, oday:string): Promise<VehiclePosition[]>;
+
+  fetchVehiclePositionGeoJson(id: string, oday:string): Promise<any>
 }
 
 
@@ -40,13 +26,18 @@ export default class VehiclePositionService implements IVehiclePositionService {
     return response.json();
   }
 
-  async fetchVehiclePositionLocations(id: string): Promise<VehiclePosition[]> {
-    const response = await fetch(`${this.base}/vehicle/positions/${id}`);
+  async fetchVehiclePositionOdays(veh: string): Promise<string[]> {    
+    const response = await fetch(`${this.base}/vehicle/positions/${veh}`);
     return response.json();
   }
 
-  async fetchVehiclePositionGeoJson(id: string): Promise<any> {
-    const response = await fetch(`${this.base}/vehicle/positions/${id}/geojson`);
+  async fetchVehiclePositionLocations(veh: string, oday:string): Promise<VehiclePosition[]> {
+    const response = await fetch(`${this.base}/vehicle/positions/${veh}/${oday}`);
+    return response.json();
+  }
+
+  async fetchVehiclePositionGeoJson(id: string, oday:string): Promise<any> {
+    const response = await fetch(`${this.base}/vehicle/positions/${id}/${oday}/geojson`);
     return response.json();
   }
 }
