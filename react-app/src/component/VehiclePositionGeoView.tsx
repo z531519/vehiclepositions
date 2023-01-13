@@ -1,15 +1,20 @@
-import { DataGrid, GridRowId, GridRowIdGetter } from '@mui/x-data-grid';
+import { GridRowId, GridRowIdGetter } from '@mui/x-data-grid';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Map, Marker, GeoJson, GeoJsonLoader, GeoJsonFeature } from "pigeon-maps"
 
 import VehiclePosition from '../model/VehiclePosition';
 import VehiclePositionLocationHeader from './VehiclePositionLocationHeader';
 import { useVehiclePositionService } from '../services/ServiceHook';
-import { Button, Paper, Popover, PopoverPosition, SelectChangeEvent, Table, TableBody, TableCell, TableContainer, TableRow, Tooltip, Typography } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, PopoverPosition, Select, SelectChangeEvent, Toolbar } from '@mui/material';
 import { useSnackbar } from 'notistack';
+import VehiclePositionGeoMap from './VehiclePositionGeoMap';
 
+
+interface filter {
+  jrn: string;
+  dir: string;
+}
 
 export default function VehiclePositionGeoView() {
   const vehiclePositionService = useVehiclePositionService({
@@ -23,7 +28,11 @@ export default function VehiclePositionGeoView() {
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [serviceData, setServiceData] = useState<any>(geoJsonSample);
+  const [geoJsonData, setGeoJsonData] = useState<any>(geoJsonSample);
   const [oday, setOday] = useState<string>();
+  const [jrns, setJrns] = useState<string[]>([]);
+  const [dirs, setDirs] = useState<string[]>([]);
+  const [filter, setFilter] = useState<filter>({jrn:"None", dir: "None"});
 
   let { id = "" } = useParams();
 
@@ -31,7 +40,13 @@ export default function VehiclePositionGeoView() {
     if (id && oday) {
       vehiclePositionService?.fetchVehiclePositionGeoJson(id, oday).then((data) => {
         setServiceData(data);
+        filterData(data);
         enqueueSnackbar(`Loaded Geo for ${oday}`);
+        
+        const jrns = data.features.map((item:any) => item.properties.jrn).filter((v: any,i: any,a: string | any[])=>a.indexOf(v)==i)
+        setJrns(jrns);
+        setDirs( data.features.map((item:any) => item.properties.dir).filter((v: any,i: any,a: string | any[])=>a.indexOf(v)==i));
+        
       });
     }
   }, [id, oday, vehiclePositionService])
@@ -47,112 +62,83 @@ export default function VehiclePositionGeoView() {
     return [coordinates[1], coordinates[0]];
 
   }
-  const [openTooltip, setOpenTooltip] = useState(false);
-  const [anchorPosition, setAnchorPosition] = useState<PopoverPosition>();
-  const [popupData, setPopupData] = useState<any>({})
-  const mapOnMouseOver = (event: any) => {
-    setOpenTooltip(true);
-  }
-
-  const mapOnMouseOut = (event: any) => {
-    setOpenTooltip(false);
-  }
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
-  const handlePopoverOpen = (eventWrapper: any) => {
-    const { event, payload } = eventWrapper;
-
-    setAnchorPosition({
-      left: event.screenX,
-      top: event.screenY,
-    })
-    console.log({
-      left: event.screenX,
-      top: event.screenY,
-    });
-    setOpenTooltip(true);
-    setPopupData(payload.properties);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-    setOpenTooltip(false);
-  };
-
-  const open = Boolean(anchorEl);
-
-  const onOdayChange = (event: SelectChangeEvent<string>, oday:string): any => {
+  
+  const onOdayChange = (event: SelectChangeEvent<string>, oday: string): any => {
     setOday(oday);
+  }
+
+  const onJrnChange = (event: SelectChangeEvent<string>, child: React.ReactNode): any => {
+    filter.jrn = event.target.value;
+    filterData(serviceData);
+  }
+
+  const onDirChange = (event: SelectChangeEvent<string>, child: React.ReactNode): any => {
+    filter.dir = event.target.value;
+    filterData(serviceData);
+  }
+
+  const filterData = (data:any):void => {
+    setGeoJsonData(geoJsonSample);
+    const {jrn, dir} = filter;
+
+    const allFeatures = [...data.features];
+    const filtered = allFeatures.filter((item:any) => {
+      let inc:boolean = true;
+      if (jrn && jrn != "None"){ 
+        inc = inc && item.properties.jrn == jrn
+      }
+      if (dir && dir != "None"){ 
+        inc = inc && item.properties.dir == dir
+      }
+      return inc;
+    })
+    geoJsonData.features = filtered;
+    setGeoJsonData({...geoJsonData});
+  
+    console.log(geoJsonData.features.length);
   }
 
   return (
     <div>
       <VehiclePositionLocationHeader veh={id} onChangeOday={onOdayChange} />
       {oday && oday != "" && serviceData.features.length > 0 &&
+        (
+          <div>
+            <Toolbar/>
+            <FormControl size='small'>
+              <InputLabel id="demo-simple-select-label">jrn</InputLabel>
+              <Select defaultValue="None"
+                label="jrn"
+                onChange={onJrnChange}>
+                <MenuItem value="None">None</MenuItem>                
+                {jrns.map((row: any) => (
+                  <MenuItem key={row} value={row}>{row}</MenuItem>
+                ))
+                }
+              </Select>
+            </FormControl>
 
-
-        <Map height={600} defaultZoom={12}
-          aria-owns={open ? 'mouse-over-popover' : undefined}
-          aria-haspopup="true"
-          center={getCenter()}>
-          <GeoJson
-            data={serviceData}
-            onMouseOver={handlePopoverOpen}
-            onMouseOut={handlePopoverClose}
-            styleCallback={(feature: { geometry: { type: string; }; }, hover: any) => {
-              if (feature.geometry.type === "LineString") {
-                return { strokeWidth: "1", stroke: "red" };
-              }
-              return {
-                fill: "#d4e6ec99",
-                strokeWidth: "2",
-                stroke: "red",
-                r: "2",
-              };
-            }}
-          />
-
-        </Map>
-      }
-      <Popover
-        id="mouse-over-popover"
-        sx={{
-          pointerEvents: 'none',
-        }}
-        open={openTooltip}
-        anchorReference="anchorPosition"
-        anchorPosition={anchorPosition}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        onClose={handlePopoverClose}
-        disableRestoreFocus
-      >
-        {/* <Typography sx={{ p: 1 }}>I use Popover. {popupData?.desi}</Typography> */}
-        <TableContainer component={Paper}>
-          <Table size="small" aria-label="a dense table">
-            <TableBody>
-              {Object.entries(popupData).map((row: any) => (
-                <TableRow
-                  key={row[0]}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            <FormControl size='small'>
+              <InputLabel id="demo-simple-select-label">dirs</InputLabel>
+              <Select defaultValue="None"
+                label="dirs"
+                onChange={onDirChange}
                 >
-                  <TableCell component="th" scope="row">
-                    {row[0]}
-                  </TableCell>
-                  <TableCell align="right">{row[1]}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Popover>
+                <MenuItem value="None">None</MenuItem>                
+                {dirs.map((row: any) => (
+                  <MenuItem key={row} value={row}>{row}</MenuItem>
+                ))
+                }
+              </Select>
+            </FormControl>
+            
+            <VehiclePositionGeoMap geoJsonData={geoJsonData}/>
+            
+
+          </div>
+        )
+      }
+      
     </div>
 
   )
