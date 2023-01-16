@@ -1,4 +1,4 @@
-import { Button, SelectChangeEvent } from '@mui/material';
+import { Button, Grid, SelectChangeEvent } from '@mui/material';
 import { DataGrid, GridRowId, GridRowIdGetter } from '@mui/x-data-grid';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -9,15 +9,15 @@ import VehiclePositionLocationHeader from './VehiclePositionLocationHeader';
 import { useSnackbar } from 'notistack';
 
 export default function VehiclePositionLocations() {
-  const vehiclePositionService = useVehiclePositionService( {
+  const vehiclePositionService = useVehiclePositionService({
     base: 'http://localhost:8080'
   });
-  
+
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const [serviceData, setServiceData] = useState<VehiclePosition[]>([]);
   const [oday, setOday] = useState<string>();
 
-  let { id = ""} = useParams();
+  let { id = "" } = useParams();
 
   useEffect(() => {
     if (id && oday) {
@@ -43,22 +43,33 @@ export default function VehiclePositionLocations() {
     { field: 'start', headerName: 'START', width: 170 }
   ];
 
-  const onOdayChange = (event: SelectChangeEvent<string>, oday:string):any => {
+  const onOdayChange = (event: SelectChangeEvent<string>, oday: string): any => {
     setOday(oday);
   }
 
   return (
-    <div>
-      <VehiclePositionLocationHeader veh={id} onChangeOday={onOdayChange} />
-      <div style={{ height: 400, width: '100%' }}>
-        <Link to={ `/vehicles/${id}/geo`}>View Geo</Link>
-        <DataGrid
-          rows={serviceData}
-          columns={columns}
-          getRowId={getRowId}          
-        />
-      </div>
-    </div>
+    <Grid container>
+      <Grid container width={800}  justifyContent="center" alignItems="center">
+        <Grid xs={8}>
+          <VehiclePositionLocationHeader veh={id} onChangeOday={onOdayChange} />
+        </Grid>
+        <Grid xs={2}>
+          <Button href={`/vehicles/${id}/geo`}
+            variant="contained"
+            color="primary"
+          >View Geo</Button>
+        </Grid>
+      </Grid>
+      <Grid xs={12}>
+        <div style={{ height: 400, width: '100%' }}>
+          <DataGrid
+            rows={serviceData}
+            columns={columns}
+            getRowId={getRowId}
+          />
+        </div>
+      </Grid>
+    </Grid>
 
   );
 }

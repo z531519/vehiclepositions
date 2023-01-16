@@ -10,50 +10,48 @@ import { useVehiclePositionService } from '../services/ServiceHook';
 
 
 export default function VehiclePositionsComponent() {
-  const vehiclePositionService = useVehiclePositionService( {
+  const vehiclePositionService = useVehiclePositionService({
     base: 'http://localhost:8080'
   });
 
   const [serviceData, setServiceData] = useState<any[]>([]);
   const navigate = useNavigate();
   const columns: GridColumns = [
-    { field: 'id', headerName: 'ID', width: 170, align:"center", headerAlign:"center" },
+    { field: 'id', headerName: 'ID', width: 250, align: "center", headerAlign: "center" },
     {
-      field: 'view', headerName: 'Actions', width: 400, align:"center", headerAlign:"center", 
+      field: 'view', headerName: 'Actions', width: 400, align: "center", headerAlign: "center",
       renderCell: (cellValues) => {
         return (
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              
-            
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={(event) => {
-              handleLocViewClick(event, cellValues);
-            }}
-          >
-            View Locations
-          </Button>
-          </Grid>
-          <Grid item xs={6}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={(event) => {
-              handleGeoClick(event, cellValues);
-            }}
-          >
-            Geo View
-          </Button>
-          </Grid>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={(event) => {
+                  handleLocViewClick(event, cellValues);
+                }}
+              >
+                View Locations
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={(event) => {
+                  handleGeoClick(event, cellValues);
+                }}
+              >
+                Geo View
+              </Button>
+            </Grid>
           </Grid>
         );
       }
     },
   ];
 
-  const handleLocViewClick = (event: any, cellValues: any) => {  
+  const handleLocViewClick = (event: any, cellValues: any) => {
     navigate(`/vehicles/${cellValues.id}`);
   };
 
@@ -63,7 +61,7 @@ export default function VehiclePositionsComponent() {
     navigate(`/vehicles/${cellValues.id}/geo`);
   }
 
-  useEffect(() => {    
+  useEffect(() => {
     vehiclePositionService?.fetchVehiclePositions().then((data) => {
       setServiceData(data.map((i: any) => ({ id: i, veh: i })));
     });

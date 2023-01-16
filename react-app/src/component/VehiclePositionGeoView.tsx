@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import VehiclePosition from '../model/VehiclePosition';
 import VehiclePositionLocationHeader from './VehiclePositionLocationHeader';
 import { useVehiclePositionService } from '../services/ServiceHook';
-import { FormControl, InputLabel, MenuItem, PopoverPosition, Select, SelectChangeEvent, Toolbar } from '@mui/material';
+import { FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import VehiclePositionGeoMap from './VehiclePositionGeoMap';
 
@@ -15,7 +15,7 @@ interface filter {
   jrn: string;
   dir: string;
   oper: string;
-  route:string;
+  route: string;
 }
 
 export default function VehiclePositionGeoView() {
@@ -38,7 +38,7 @@ export default function VehiclePositionGeoView() {
   const [routes, setRoutes] = useState<string[]>([]);
 
   const [filter, setFilter] = useState<filter>({
-    jrn:"None", 
+    jrn: "None",
     dir: "None",
     oper: "None",
     route: "None",
@@ -52,12 +52,12 @@ export default function VehiclePositionGeoView() {
         setServiceData(data);
         filterData(data);
         enqueueSnackbar(`Loaded Geo for ${oday}`);
-                
-        setJrns(data.features.map((item:any) => item.properties.jrn).filter((v: any,i: any,a: string | any[])=>a.indexOf(v)==i));
-        setDirs( data.features.map((item:any) => item.properties.dir).filter((v: any,i: any,a: string | any[])=>a.indexOf(v)==i));
-        setOpers( data.features.map((item:any) => item.properties.oper).filter((v: any,i: any,a: string | any[])=>a.indexOf(v)==i));
-        setRoutes( data.features.map((item:any) => item.properties.route).filter((v: any,i: any,a: string | any[])=>a.indexOf(v)==i));
-        
+
+        setJrns(data.features.map((item: any) => item.properties.jrn).filter((v: any, i: any, a: string | any[]) => a.indexOf(v) == i));
+        setDirs(data.features.map((item: any) => item.properties.dir).filter((v: any, i: any, a: string | any[]) => a.indexOf(v) == i));
+        setOpers(data.features.map((item: any) => item.properties.oper).filter((v: any, i: any, a: string | any[]) => a.indexOf(v) == i));
+        setRoutes(data.features.map((item: any) => item.properties.route).filter((v: any, i: any, a: string | any[]) => a.indexOf(v) == i));
+
       });
     }
   }, [id, oday, vehiclePositionService])
@@ -73,7 +73,7 @@ export default function VehiclePositionGeoView() {
     return [coordinates[1], coordinates[0]];
 
   }
-  
+
   const onOdayChange = (event: SelectChangeEvent<string>, oday: string): any => {
     setOday(oday);
   }
@@ -98,103 +98,116 @@ export default function VehiclePositionGeoView() {
     filterData(serviceData);
   }
 
-  const filterData = (data:any):void => {
+  const filterData = (data: any): void => {
     setGeoJsonData(geoJsonSample);
-    const {jrn, dir, route, oper} = filter;
+    const { jrn, dir, route, oper } = filter;
 
     const allFeatures = [...data.features];
-    const filtered = allFeatures.filter((item:any) => {
-      let inc:boolean = true;
-      if (jrn && jrn != "None"){ 
+    const filtered = allFeatures.filter((item: any) => {
+      let inc: boolean = true;
+      if (jrn && jrn != "None") {
         inc = inc && item.properties.jrn == jrn
       }
-      if (dir && dir != "None"){ 
+      if (dir && dir != "None") {
         inc = inc && item.properties.dir == dir
       }
-      if (route && route != "None"){ 
+      if (route && route != "None") {
         inc = inc && item.properties.route == route
       }
-      if (oper && oper != "None"){ 
+      if (oper && oper != "None") {
         inc = inc && item.properties.oper == oper
       }
       return inc;
     })
     geoJsonData.features = filtered;
-    setGeoJsonData({...geoJsonData});
-  
+    setGeoJsonData({ ...geoJsonData });
+
     console.log(geoJsonData.features.length);
   }
 
   return (
-    <div>
-      <VehiclePositionLocationHeader veh={id} onChangeOday={onOdayChange} />
-      {oday && oday != "" && serviceData.features.length > 0 &&
-        (
-          <div>
-            <Toolbar/>
-            <FormControl size='small'>
-              <InputLabel id="demo-simple-select-label">jrn</InputLabel>
-              <Select defaultValue="None"
-                label="jrn"
-                onChange={onJrnChange}>
-                <MenuItem value="None">None</MenuItem>                
-                {jrns.map((row: any) => (
-                  <MenuItem key={row} value={row}>{row}</MenuItem>
-                ))
-                }
-              </Select>
-            </FormControl>
-
-            <FormControl size='small'>
-              <InputLabel id="demo-simple-select-label">dirs</InputLabel>
-              <Select defaultValue="None"
-                label="dirs"
-                onChange={onDirChange}
-                >
-                <MenuItem value="None">None</MenuItem>                
-                {dirs.map((row: any) => (
-                  <MenuItem key={row} value={row}>{row}</MenuItem>
-                ))
-                }
-              </Select>
-            </FormControl>
-
-            <FormControl size='small'>
-              <InputLabel id="demo-simple-select-label">oper</InputLabel>
-              <Select defaultValue="None"
-                label="opers"
-                onChange={onOperChange}
-                >
-                <MenuItem value="None">None</MenuItem>                
-                {opers.map((row: any) => (
-                  <MenuItem key={row} value={row}>{row}</MenuItem>
-                ))
-                }
-              </Select>
-            </FormControl>
-
-            <FormControl size='small'>
-              <InputLabel id="demo-simple-select-label">routes</InputLabel>
-              <Select defaultValue="None"
-                label="routes"
-                onChange={onRouteChange}
-                >
-                <MenuItem value="None">None</MenuItem>                
-                {routes.map((row: any) => (
-                  <MenuItem key={row} value={row}>{row}</MenuItem>
-                ))
-                }
-              </Select>
-            </FormControl>
-            
-            <VehiclePositionGeoMap geoJsonData={geoJsonData}/>
-            
-
-          </div>
-        )
-      }
+    <Grid container padding={2} >
+      <Grid xs={5} border={'black'}>
+        <VehiclePositionLocationHeader veh={id} onChangeOday={onOdayChange} />
+      </Grid>
       
-    </div>
+          <Grid container xs={7} padding={2} rowGap={2}>
+            <Grid container>
+              <Typography>More Filters:</Typography>
+            </Grid>
+            <Grid container xs={6} >
+              <Grid xs={3}>
+                <FormControl size='small'>
+                  <InputLabel id="demo-simple-select-label">jrn</InputLabel>
+                  <Select defaultValue="None"
+                    label="jrn"
+                    onChange={onJrnChange}>
+                    <MenuItem value="None">None</MenuItem>
+                    {jrns.map((row: any) => (
+                      <MenuItem key={row} value={row}>{row}</MenuItem>
+                    ))
+                    }
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid xs={3}>
+                <FormControl size='small'>
+                  <InputLabel id="demo-simple-select-label">dirs</InputLabel>
+                  <Select defaultValue="None"
+                    label="dirs"
+                    onChange={onDirChange}
+                  >
+                    <MenuItem value="None">None</MenuItem>
+                    {dirs.map((row: any) => (
+                      <MenuItem key={row} value={row}>{row}</MenuItem>
+                    ))
+                    }
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid xs={3}>
+                <FormControl size='small'>
+                  <InputLabel id="demo-simple-select-label">oper</InputLabel>
+                  <Select defaultValue="None"
+                    label="opers"
+                    onChange={onOperChange}
+                  >
+                    <MenuItem value="None">None</MenuItem>
+                    {opers.map((row: any) => (
+                      <MenuItem key={row} value={row}>{row}</MenuItem>
+                    ))
+                    }
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid xs={3}>
+                <FormControl size='small'>
+                  <InputLabel id="demo-simple-select-label">routes</InputLabel>
+                  <Select defaultValue="None"
+                    label="routes"
+                    onChange={onRouteChange}
+                  >
+                    <MenuItem value="None">None</MenuItem>
+                    {routes.map((row: any) => (
+                      <MenuItem key={row} value={row}>{row}</MenuItem>
+                    ))
+                    }
+                  </Select>
+                </FormControl>
+              </Grid>
+
+            </Grid>
+
+
+
+
+            
+          </Grid>
+          <Grid xs={12}>
+          <VehiclePositionGeoMap geoJsonData={geoJsonData} />
+        </Grid>
+      
+    </Grid>
 
   )
 }
