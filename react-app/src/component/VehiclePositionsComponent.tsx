@@ -7,11 +7,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Grid } from '@mui/material';
 import { useVehiclePositionService } from '../services/ServiceHook';
+import { ConfigProps } from '../services/Config';
 
 
 export default function VehiclePositionsComponent() {
   const vehiclePositionService = useVehiclePositionService({
-    base: 'http://localhost:8080'
+    base: ConfigProps().base,
   });
 
   const [serviceData, setServiceData] = useState<any[]>([]);
@@ -57,7 +58,6 @@ export default function VehiclePositionsComponent() {
 
   const handleGeoClick = (event: any, cellValues: any) => {
     console.log(cellValues);
-    // window.open(`http://localhost:8080/vehicle/positions/${cellValues.id}/geo`, '_blank', 'noreferrer');
     navigate(`/vehicles/${cellValues.id}/geo`);
   }
 

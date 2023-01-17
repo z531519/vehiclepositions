@@ -7,10 +7,11 @@ import VehiclePosition from '../model/VehiclePosition';
 import { useVehiclePositionService } from '../services/ServiceHook';
 import VehiclePositionLocationHeader from './VehiclePositionLocationHeader';
 import { useSnackbar } from 'notistack';
+import { ConfigProps } from '../services/Config';
 
 export default function VehiclePositionLocations() {
   const vehiclePositionService = useVehiclePositionService({
-    base: 'http://localhost:8080'
+    base: ConfigProps().base,
   });
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();

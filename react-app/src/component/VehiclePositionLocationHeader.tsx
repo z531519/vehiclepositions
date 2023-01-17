@@ -7,6 +7,7 @@ import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Grid } fr
 import { useParams } from 'react-router';
 import { useState } from 'react';
 import { SelectInputProps } from '@mui/material/Select/SelectInput';
+import { ConfigProps } from '../services/Config';
 
 interface Props {
   veh: string;
@@ -14,7 +15,7 @@ interface Props {
 }
 export default function VehiclePositionLocationHeader({ veh, onChangeOday }: Props) {
   const vehiclePositionService = useVehiclePositionService({
-    base: 'http://localhost:8080'
+    base: ConfigProps().base,
   });
   const [serviceData, setServiceData] = useState<string[]>([]);
   const [selectedOday, setSelectedOday] = useState<string>();

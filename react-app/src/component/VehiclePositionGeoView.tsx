@@ -9,6 +9,7 @@ import { useVehiclePositionService } from '../services/ServiceHook';
 import { FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import VehiclePositionGeoMap from './VehiclePositionGeoMap';
+import { ConfigProps } from '../services/Config';
 
 
 interface filter {
@@ -20,7 +21,7 @@ interface filter {
 
 export default function VehiclePositionGeoView() {
   const vehiclePositionService = useVehiclePositionService({
-    base: 'http://localhost:8080'
+    base: ConfigProps().base,
   });
 
   const geoJsonSample = {
