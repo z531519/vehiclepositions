@@ -8,10 +8,6 @@ import { Paper, Popover, PopoverPosition, Table, TableBody, TableCell, TableCont
 
 export default function VehiclePositionGeoMap({ geoJsonData }: any) {
 
-  const geoJsonSample = {
-    type: "FeatureCollection",
-    features: [],
-  };
 
   useEffect(() => {
     getCenter();
@@ -19,7 +15,7 @@ export default function VehiclePositionGeoMap({ geoJsonData }: any) {
 
 
   const getCenter = (): void => {
-    if (geoJsonData.features.length == 0) {
+    if (geoJsonData.features.length === 0) {
       return;
     }
     const totalFeatures = geoJsonData.features.length;
