@@ -1,4 +1,4 @@
-import { ConsumerConfig, KafkaConfig } from "kafkajs";
+import { ConsumerConfig, KafkaConfig, ProducerConfig } from "kafkajs";
 import { RedisClientOptions } from "redis";
 
 const config = {
@@ -9,7 +9,12 @@ const config = {
     } as KafkaConfig,
     ConsumerConfig: {
       groupId: "sample-js-consumer"
-    } as ConsumerConfig
+    } as ConsumerConfig,
+    ProducerConfig: {      
+      maxInFlightRequests: 1,
+      idempotent: true,
+      transactionalId: "sample-js-producer"    
+    } as ProducerConfig,
   },
   redis: {
     RedisClientOptions: {

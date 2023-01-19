@@ -1,12 +1,9 @@
 import kafka from "./kafka";
+import config from "config";
 
-const consumer = kafka.consumer({ groupId: "sample-js-group" });
+const consumer = kafka.consumer( config.get("kafka.ConsumerConfig"));
 
-const producer = kafka.producer({
-  maxInFlightRequests: 1,
-  idempotent: true,
-  transactionalId: "sample-js-producer"
-});
+const producer = kafka.producer( config.get("kafka.ProducerConfig"));
 
 async function sendPayload(vehiclePosition: any) {
   try {

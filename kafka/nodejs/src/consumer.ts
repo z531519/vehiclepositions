@@ -1,7 +1,8 @@
 import kafka from "./kafka";
 import { initRedisClient } from "./redis";
+import config from 'config';
 
-const consumer = kafka.consumer({ groupId: "sample-js-slim-group" });
+const consumer = kafka.consumer( config.get("kafka.ConsumerConfig"));
 
 const startConsumer = async () => {
   await consumer.connect();

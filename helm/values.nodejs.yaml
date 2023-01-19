@@ -38,11 +38,15 @@ containers:
       protocol: TCP
   healthEndpoints:
     enabled: true
+    livenessProbe:
+      httpGet:
+        path: /vehicle/positions
+        port: 8080
+    readinessProbe:
+      httpGet:
+        path: /vehicle/positions
+        port: 8080
   env:
-    - name: BOOTSTRAP_SERVERS
-      value: ${BOOTSTRAP_SERVERS}
-    - name: REDIS
-      value: redis://${REDIS}:6379
   envFrom:
 
 data: 
@@ -57,6 +61,11 @@ data:
         },
         "ConsumerConfig": {
           "groupId": "sample-js-consumer"
+        },
+        "ProducerConfig": {      
+          "maxInFlightRequests": 1,
+          "idempotent": true,
+          "transactionalId": "sample-js-producer"    
         }
       },
       "redis": {

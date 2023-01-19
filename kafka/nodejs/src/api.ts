@@ -1,11 +1,9 @@
-import express, { Express, Request, Response } from 'express';
+import express, {  } from 'express';
 import { initRedisClient } from './redis';
-import geojson, {GeoJSON} from 'geojson';
+import geojson from 'geojson';
 import cors from 'cors';
 
-import request from 'request';
 
-import tokml from '@maphubs/tokml'
 
 const startApi = async () => {
   const app = express();
