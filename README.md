@@ -36,7 +36,7 @@ Each sample folder contains a `docker` folder.  This is used to build a local do
 
 A Front-End React App can be used that works with the NodeJS API/Consumer app.  There are two flavors provided:
 - Jump to [Plain React](react-app/)
-- Jump to [NextJS]()(../nextjs/react-app/)
+- Jump to [NextJS](../nextjs/react-app/)
 
 # Kubernetes
 
