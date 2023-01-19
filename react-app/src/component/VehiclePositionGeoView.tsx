@@ -1,27 +1,18 @@
-import { GridRowId, GridRowIdGetter } from '@mui/x-data-grid';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 
-import VehiclePosition from '../model/VehiclePosition';
 import VehiclePositionLocationHeader from './VehiclePositionLocationHeader';
 import { useVehiclePositionService } from '../services/ServiceHook';
-import { FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
+import { CircularProgress, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import VehiclePositionGeoMap from './VehiclePositionGeoMap';
-import { ConfigProps } from '../services/Config';
+import { ConfigProperties } from '../services/Config';
 
 
-interface filter {
-  jrn: string;
-  dir: string;
-  oper: string;
-  route: string;
-}
 
-export default function VehiclePositionGeoView() {
+export default function VehiclePositionGeoView({veh}:any) {
   const vehiclePositionService = useVehiclePositionService({
-    base: ConfigProps().base,
+    base: ConfigProperties().base,
   });
 
   const geoJsonSample = {
@@ -29,7 +20,7 @@ export default function VehiclePositionGeoView() {
     features: [],
   };
 
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const [serviceData, setServiceData] = useState<any>(geoJsonSample);
   const [geoJsonData, setGeoJsonData] = useState<any>(geoJsonSample);
   const [oday, setOday] = useState<string>();
@@ -37,43 +28,32 @@ export default function VehiclePositionGeoView() {
   const [dirs, setDirs] = useState<string[]>([]);
   const [opers, setOpers] = useState<string[]>([]);
   const [routes, setRoutes] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const [filter, setFilter] = useState<filter>({
+  const filter = {
     jrn: "None",
     dir: "None",
     oper: "None",
     route: "None",
-  });
-
-  let { id = "" } = useParams();
+  };
 
   useEffect(() => {
-    if (id && oday) {
-      vehiclePositionService?.fetchVehiclePositionGeoJson(id, oday).then((data) => {
+    if (veh && oday) {
+      setLoading(true);
+      vehiclePositionService?.fetchVehiclePositionGeoJson(veh, oday).then((data) => {
         setServiceData(data);
         filterData(data);
         enqueueSnackbar(`Loaded Geo for ${oday}`);
 
-        setJrns(data.features.map((item: any) => item.properties.jrn).filter((v: any, i: any, a: string | any[]) => a.indexOf(v) == i));
-        setDirs(data.features.map((item: any) => item.properties.dir).filter((v: any, i: any, a: string | any[]) => a.indexOf(v) == i));
-        setOpers(data.features.map((item: any) => item.properties.oper).filter((v: any, i: any, a: string | any[]) => a.indexOf(v) == i));
-        setRoutes(data.features.map((item: any) => item.properties.route).filter((v: any, i: any, a: string | any[]) => a.indexOf(v) == i));
-
+        setJrns(data.features.map((item: any) => item.properties.jrn).filter((v: any, i: any, a: string | any[]) => a.indexOf(v) === i));
+        setDirs(data.features.map((item: any) => item.properties.dir).filter((v: any, i: any, a: string | any[]) => a.indexOf(v) === i));
+        setOpers(data.features.map((item: any) => item.properties.oper).filter((v: any, i: any, a: string | any[]) => a.indexOf(v) === i));
+        setRoutes(data.features.map((item: any) => item.properties.route).filter((v: any, i: any, a: string | any[]) => a.indexOf(v) === i));
+        setLoading(false);
       });
     }
-  }, [id, oday, vehiclePositionService])
+  }, [veh, oday, vehiclePositionService, enqueueSnackbar])
 
-  const getRowId: GridRowIdGetter<VehiclePosition> = (item: VehiclePosition): GridRowId => {
-    return item.tsi;
-  }
-
-  const getCenter = (): [number, number] => {
-    const totalFeatures = serviceData?.features.length;
-
-    const coordinates = serviceData?.features[Math.round(totalFeatures / 2) - 1].geometry.coordinates
-    return [coordinates[1], coordinates[0]];
-
-  }
 
   const onOdayChange = (event: SelectChangeEvent<string>, oday: string): any => {
     setOday(oday);
@@ -106,38 +86,36 @@ export default function VehiclePositionGeoView() {
     const allFeatures = [...data.features];
     const filtered = allFeatures.filter((item: any) => {
       let inc: boolean = true;
-      if (jrn && jrn != "None") {
-        inc = inc && item.properties.jrn == jrn
+      if (jrn && jrn !== "None") {
+        inc = inc && item.properties.jrn === jrn
       }
-      if (dir && dir != "None") {
-        inc = inc && item.properties.dir == dir
+      if (dir && dir !== "None") {
+        inc = inc && item.properties.dir === dir
       }
-      if (route && route != "None") {
-        inc = inc && item.properties.route == route
+      if (route && route !== "None") {
+        inc = inc && item.properties.route === route
       }
-      if (oper && oper != "None") {
-        inc = inc && item.properties.oper == oper
+      if (oper && oper !== "None") {
+        inc = inc && item.properties.oper === oper
       }
       return inc;
     })
     geoJsonData.features = filtered;
     setGeoJsonData({ ...geoJsonData });
-
-    console.log(geoJsonData.features.length);
   }
 
   return (
     <Grid container padding={2} >
-      <Grid xs={5} border={'black'}>
-        <VehiclePositionLocationHeader veh={id} onChangeOday={onOdayChange} />
+      <Grid item xs={5} border={'black'}>
+        <VehiclePositionLocationHeader veh={veh} onChangeOday={onOdayChange} />
       </Grid>
       
-          <Grid container xs={7} padding={2} rowGap={2}>
+          <Grid container item  xs={7} padding={2} rowGap={2}>
             <Grid container>
               <Typography>More Filters:</Typography>
             </Grid>
-            <Grid container xs={6} >
-              <Grid xs={3}>
+            <Grid container item xs={6} >
+              <Grid item xs={3}>
                 <FormControl size='small'>
                   <InputLabel id="demo-simple-select-label">jrn</InputLabel>
                   <Select defaultValue="None"
@@ -151,7 +129,7 @@ export default function VehiclePositionGeoView() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid xs={3}>
+              <Grid item xs={3}>
                 <FormControl size='small'>
                   <InputLabel id="demo-simple-select-label">dirs</InputLabel>
                   <Select defaultValue="None"
@@ -166,7 +144,7 @@ export default function VehiclePositionGeoView() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid xs={3}>
+              <Grid item xs={3}>
                 <FormControl size='small'>
                   <InputLabel id="demo-simple-select-label">oper</InputLabel>
                   <Select defaultValue="None"
@@ -181,7 +159,7 @@ export default function VehiclePositionGeoView() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid xs={3}>
+              <Grid item xs={3}>
                 <FormControl size='small'>
                   <InputLabel id="demo-simple-select-label">routes</InputLabel>
                   <Select defaultValue="None"
@@ -198,13 +176,12 @@ export default function VehiclePositionGeoView() {
               </Grid>
 
             </Grid>
-
-
-
-
-            
+            {loading && (
+              <CircularProgress />                
+            )}
           </Grid>
-          <Grid xs={12}>
+          <Grid item xs={12}>
+          
           <VehiclePositionGeoMap geoJsonData={geoJsonData} />
         </Grid>
       

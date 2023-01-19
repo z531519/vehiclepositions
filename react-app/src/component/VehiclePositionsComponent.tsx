@@ -1,22 +1,33 @@
+"use client"
 import * as React from 'react';
-import { DataGrid, GridColumns, GridEventListener } from '@mui/x-data-grid';
+import { DataGrid, GridColumns } from '@mui/x-data-grid';
 
-import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-
-import { useNavigate } from 'react-router-dom';
 import { Button, Grid } from '@mui/material';
 import { useVehiclePositionService } from '../services/ServiceHook';
-import { ConfigProps } from '../services/Config';
+import { ConfigProperties } from '../services/Config';
+import { useEffect, useState } from 'react';
+import { useSnackbar } from 'notistack';
 
-
-export default function VehiclePositionsComponent() {
-  const vehiclePositionService = useVehiclePositionService({
-    base: ConfigProps().base,
-  });
+export default function VehiclePositionsComponent() {  
+  const vehiclePositionService = useVehiclePositionService(ConfigProperties());
+  const router = useRouter();
 
   const [serviceData, setServiceData] = useState<any[]>([]);
-  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {    
+              
+    vehiclePositionService?.fetchVehiclePositions().then((data) => {
+      enqueueSnackbar(`Loaded Vehicles`);
+      const list =  data.map((i: any) => ({ id: i, veh: i }));
+      setServiceData(list);
+    });   
+  }, [vehiclePositionService]);
+
+  
+
   const columns: GridColumns = [
     { field: 'id', headerName: 'ID', width: 250, align: "center", headerAlign: "center" },
     {
@@ -52,28 +63,24 @@ export default function VehiclePositionsComponent() {
     },
   ];
 
+
   const handleLocViewClick = (event: any, cellValues: any) => {
-    navigate(`/vehicles/${cellValues.id}`);
+    router.push(`/vehicles/${cellValues.id}/loc`);
   };
 
   const handleGeoClick = (event: any, cellValues: any) => {
-    console.log(cellValues);
-    navigate(`/vehicles/${cellValues.id}/geo`);
+    router.push(`/vehicles/${cellValues.id}/geo`);
   }
-
-  useEffect(() => {
-    vehiclePositionService?.fetchVehiclePositions().then((data) => {
-      setServiceData(data.map((i: any) => ({ id: i, veh: i })));
-    });
-  }, [vehiclePositionService])
-
   return (
     <div style={{ height: 600, width: '100%' }}>
+      
+      {serviceData && serviceData.length > 0 && 
       <DataGrid
         rows={serviceData}
         columns={columns}
         pageSize={25}
       />
+      }
     </div>
   );
 }

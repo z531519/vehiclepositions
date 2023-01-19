@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
+import { ConfigProps } from './Config';
 import VehiclePositionService, { IVehiclePositionService } from './VehiclePositionService';
-
-
-
 
 export interface ServiceParams {
   base:string
@@ -15,7 +13,7 @@ export interface ServiceParams {
  * @returns translationService
  */
 export function useVehiclePositionService(
-  serviceParams?: ServiceParams
+  configProps: ConfigProps
 ): IVehiclePositionService | undefined {
   const [vehiclePositionService, setVehiclePositionService] = useState<
   IVehiclePositionService
@@ -28,10 +26,9 @@ export function useVehiclePositionService(
     //todo: this would probably "new up" a service with the host and any other initial
     // values
     
-    setVehiclePositionService(new VehiclePositionService(serviceParams?.base as string));
+    setVehiclePositionService(new VehiclePositionService(configProps?.base as string));
  
-  }, [    
-  ]);
+  }, [configProps?.base]);
 
   return vehiclePositionService;
 }

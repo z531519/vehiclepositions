@@ -1,5 +1,7 @@
+'use client'
+
 import * as React from 'react';
-import { styled, ThemeProvider } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
@@ -16,12 +18,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { mainListItems } from './listItems';
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import VehiclePositionsComponent from '../VehiclePositionsComponent';
-import VehiclePositionLocations from '../VehiclePositionLocations';
-import VehiclePositionGeoView from '../VehiclePositionGeoView';
 
-import screenshot from './screenshot.png';
 
 
 function Copyright(props: any) {
@@ -88,14 +85,18 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 
-function DashboardContent() {
+export default function DashboardContent({
+  children,
+}: {
+  children: React.ReactNode
+})  {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
   return (
-    <Router>
+    <div>
       
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
@@ -163,16 +164,7 @@ function DashboardContent() {
 
                 <Grid item xs={12}>
                   <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-
-                    <Routes>
-                      <Route path="/vehicles" element={<VehiclePositionsComponent />} />
-                      <Route path="/vehicles/:id" element={<VehiclePositionLocations />} />
-                      <Route path="/vehicles/:id/geo" element={<VehiclePositionGeoView />} />
-                      <Route path="*" element={<div>
-                        <Typography>Demo App for Vehicle Positions</Typography>
-                        <img src={screenshot} width="50%" height="50%"/>
-                      </div>} />
-                    </Routes>
+                    {children}                    
                   </Paper>
                 </Grid>
               </Grid>
@@ -181,10 +173,6 @@ function DashboardContent() {
           </Box>
         </Box>
       
-    </Router>
+    </div>
   );
-}
-
-export default function Dashboard() {
-  return <DashboardContent />;
 }

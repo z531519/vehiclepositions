@@ -46,6 +46,10 @@ containers:
     - name: API_URL
       value: ${API_URL}
   envFrom:
+  
+securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
 
 
 service:

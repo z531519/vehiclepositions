@@ -1,33 +1,30 @@
+'use client'
+
 import { Button, Grid, SelectChangeEvent } from '@mui/material';
 import { DataGrid, GridRowId, GridRowIdGetter } from '@mui/x-data-grid';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
 import VehiclePosition from '../model/VehiclePosition';
 import { useVehiclePositionService } from '../services/ServiceHook';
 import VehiclePositionLocationHeader from './VehiclePositionLocationHeader';
 import { useSnackbar } from 'notistack';
-import { ConfigProps } from '../services/Config';
+import { ConfigProperties } from '../services/Config';
 
-export default function VehiclePositionLocations() {
-  const vehiclePositionService = useVehiclePositionService({
-    base: ConfigProps().base,
-  });
+export default function VehiclePositionLocations({veh}:any) {
+  const vehiclePositionService = useVehiclePositionService(ConfigProperties());
 
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const [serviceData, setServiceData] = useState<VehiclePosition[]>([]);
   const [oday, setOday] = useState<string>();
 
-  let { id = "" } = useParams();
-
-  useEffect(() => {
-    if (id && oday) {
-      vehiclePositionService?.fetchVehiclePositionLocations(id, oday).then((data) => {
+  useEffect(() => {    
+    if (veh && oday) {
+      vehiclePositionService?.fetchVehiclePositionLocations(veh, oday).then((data) => {
         setServiceData(data);
         enqueueSnackbar(`Loaded locations for ${oday}`);
       });
     }
-  }, [id, oday, vehiclePositionService])
+  }, [veh, oday, vehiclePositionService, enqueueSnackbar])
 
   const getRowId: GridRowIdGetter<VehiclePosition> = (item: VehiclePosition): GridRowId => {
     return item.tsi;
@@ -49,19 +46,20 @@ export default function VehiclePositionLocations() {
   }
 
   return (
-    <Grid container>
+    <Grid container >
       <Grid container width={800}  justifyContent="center" alignItems="center">
-        <Grid xs={8}>
-          <VehiclePositionLocationHeader veh={id} onChangeOday={onOdayChange} />
+        <Grid item xs={8}>
+          <VehiclePositionLocationHeader veh={veh} onChangeOday={onOdayChange} />
         </Grid>
-        <Grid xs={2}>
-          <Button href={`/vehicles/${id}/geo`}
+        <Grid item xs={2}>
+          <Button href={`/vehicles/${veh}/geo`}
             variant="contained"
             color="primary"
           >View Geo</Button>
         </Grid>
       </Grid>
-      <Grid xs={12}>
+
+      <Grid item xs={12}>
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid
             rows={serviceData}
