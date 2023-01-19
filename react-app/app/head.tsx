@@ -12,8 +12,7 @@ async function getEnvironment() {
 export default async function Head() {
   const nextCookies = cookies();
   const props = await getEnvironment();
-  console.log(props);
-  // console.log(searchParams);
+  
   return (
     <>
       <title></title>

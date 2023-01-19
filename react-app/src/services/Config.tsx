@@ -6,7 +6,6 @@ export interface ConfigProps {
 }
 
 export function setBase(url:string) {
-  console.log(`setting base to ${url}`);
   base = url;
 }
 

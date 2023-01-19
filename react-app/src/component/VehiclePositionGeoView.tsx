@@ -102,8 +102,6 @@ export default function VehiclePositionGeoView({veh}:any) {
     })
     geoJsonData.features = filtered;
     setGeoJsonData({ ...geoJsonData });
-
-    console.log(geoJsonData.features.length);
   }
 
   return (
