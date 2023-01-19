@@ -1,0 +1,19 @@
+{
+  "kafka": {
+    "KafkaConfig": {
+      "clientId": "sample-js-app",
+      "brokers": [
+        "kafka:9092"
+      ]
+    },
+    "ConsumerConfig": {
+      "groupId": "sample-js-consumer"
+    }
+  },
+  "redis": {
+    "RedisClientOptions": {
+      "url": "redis://localhost:6379",
+      "database": 3
+    }
+  }
+}

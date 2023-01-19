@@ -1,18 +1,13 @@
 FROM node:18-slim
 
+USER node
 WORKDIR /app
 
-COPY package*.json ./
-COPY tsconfig.json ./
-COPY src ./src
-COPY .env ./
+COPY --chown=node package*.json tsconfig.json ./
+COPY --chown=node config ./config
+COPY --chown=node src ./src
 
 RUN npm ci
-
-RUN chown -R www-data /app
-USER www-data
-
-WORKDIR /app
 ENV HOME=/app
 ENV NODE_ENV production
 

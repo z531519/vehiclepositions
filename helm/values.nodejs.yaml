@@ -45,6 +45,27 @@ containers:
       value: redis://${REDIS}:6379
   envFrom:
 
+data: 
+  production.json: |
+    {
+      "kafka": {
+        "KafkaConfig": {
+          "clientId": "sample-js-app",
+          "brokers": [
+            "${BOOTSTRAP_SERVERS}"
+          ]
+        },
+        "ConsumerConfig": {
+          "groupId": "sample-js-consumer"
+        }
+      },
+      "redis": {
+        "RedisClientOptions": {
+          "url": "redis://${REDIS}:6379",
+          "database": 3
+        }
+      }
+    }
 
 
 service:
@@ -54,3 +75,15 @@ service:
       protocol: TCP
       port: 8080
       targetPort: http    
+
+
+volumeMounts:
+- name: config-volume
+  mountPath: /app/config
+
+volumes:
+- name: config-volume
+  configMap:
+    # Provide the name of the ConfigMap containing the files you want
+    # to add to the container
+    name: vpconsumer-js

@@ -1,12 +1,12 @@
 import { createClient, RedisClientType } from "redis";
+import config from 'config';
 
 let client: RedisClientType;
 
 const initRedisClient = async (): Promise<RedisClientType> => {
-  client = createClient({
-    url: process.env.REDIS || "redis://localhost:6379",
-    database: parseInt(process.env.REDIS_DB || "3")
-  });
+  console.log('redis.RedisClientOptions:');
+  console.log(config.get("redis.RedisClientOptions"));
+  client = createClient(config.get("redis.RedisClientOptions"));
 
   client.on("error", err => console.log("Redis Client Error", err));
 
